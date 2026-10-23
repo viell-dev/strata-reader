@@ -9,6 +9,9 @@ concurrency:
   cancel-in-progress: true
 permissions:
   contents: read
+defaults:
+  run:
+    shell: bash
 jobs:
   fast:
     name: Fast checks

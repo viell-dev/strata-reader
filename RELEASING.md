@@ -48,22 +48,36 @@ cargo +"$msrv" test --doc --all-features
 ```bash
 cargo package --list
 cargo package
-(cd target/package/strata-reader-<version> && cargo test --all-features)
+(
+  cd target/package/strata-reader-<version> &&
+  cargo test --all-targets --all-features &&
+  cargo test --doc --all-features
+)
 ```
 
-The listing must contain every file the README, changelog, and licensing documents link to, and
-every test, example, or benchmark meant to ship. If it does not, fix the `include` list in a new
-commit and run the gate again. The tests in the extracted copy show that the published source is
-testable as shipped.
+The listing must contain every repository-local file the packaged README, changelog, and licensing
+documents link to, plus every test, example, or benchmark meant to ship. If it does not, fix the
+`include` list in a new commit and run the gate again. The tests in the extracted copy check the
+shipped source, including the benchmark smoke cases; keep separate doctests because
+`--all-targets` excludes them.
 
 Report the results in the pull request description: the commit, the host, the compiler versions,
-the test counts per stage, and every ignored test with its reason. Then merge with a
-fast-forward, so that the gated commit is the one that reaches `main`. A rebase after the gate
-produces a new commit; gate that one instead.
+the test counts per stage, and every ignored test with its reason.
 
-## 3. Tag and publish
+## 3. Merge and verify the final commit
 
-From the repository root, on the gated commit:
+Complete the repository's review requirements and merge using a permitted method. A true
+fast-forward preserves the gated commit; GitHub's Rebase and merge creates new commit SHAs, as do
+squash and merge-commit operations. Do not bypass branch protection to preserve a SHA.
+
+Check out the resulting commit on `main` and compare its full SHA with the gated SHA. If it
+changed, rerun all three stages of the gate on that resulting commit and record the new SHA and
+results on the release pull request. If a stage fails, fix the problem through a new pull request
+and repeat this process. A gate on an earlier PR head does not verify the merged commit.
+
+## 4. Tag and publish
+
+From a clean repository root, on the exact final commit verified above:
 
 ```bash
 git tag <version>
