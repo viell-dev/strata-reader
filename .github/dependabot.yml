@@ -1,0 +1,46 @@
+# Dependabot version updates for a Rust library: its Cargo dependencies, the
+# development compiler pinned in rust-toolchain.toml, and the actions its GitHub
+# workflows use. Security updates are enabled separately in the repository
+# settings and use the same labels.
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    # Wait a week after a release before proposing it.
+    cooldown:
+      default-days: 7
+    # One pull request for compatible updates; major updates stay separate.
+    groups:
+      cargo:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    labels:
+      - "Type: Maintenance"
+
+  # Proposes each new stable release as the development compiler.
+  - package-ecosystem: "rust-toolchain"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    labels:
+      - "Type: Maintenance"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns:
+          - "*"
+    labels:
+      - "Type: Maintenance"

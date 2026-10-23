@@ -63,6 +63,9 @@ workflow's commands identical to its document when either changes.
 - `.github/workflows/release-checks.yml` runs the three stages of `RELEASING.md` as separate
   jobs, by manual dispatch only. Dispatch it on the release branch and verify the run's head SHA
   before citing it as the release gate. The workflow must exist on `main` before dispatch.
+- `.github/dependabot.yml` proposes monthly Cargo, development-compiler, and Actions updates.
+  Dependabot does not read `rust-version`, so before merging a Cargo update, dispatch
+  `release-checks.yml` on its branch and confirm the MSRV stage passes.
 - Codeberg is a manual Git mirror; its Actions are disabled. Use GitHub for issues and PRs.
 
 ## Issues and Pull Requests
