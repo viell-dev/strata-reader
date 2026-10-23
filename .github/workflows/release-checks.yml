@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+defaults:
+  run:
+    shell: bash
 jobs:
   fast:
     name: Fast checks
@@ -81,4 +84,5 @@ jobs:
       - name: Test the extracted package
         run: |
           cd target/package/strata-reader-*/
-          cargo test --all-features
+          cargo test --all-targets --all-features
+          cargo test --doc --all-features
