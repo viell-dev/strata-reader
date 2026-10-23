@@ -38,11 +38,17 @@ description:
 
 - The minimum supported Rust version is declared by `rust-version` in `Cargo.toml` and stated in
   the README. [`rust-toolchain.toml`](rust-toolchain.toml) selects the development compiler,
-  which may be newer; it is not the MSRV.
+  which may be newer; it is not the MSRV. It lists the `rustfmt` and `clippy` components the fast
+  checks need, so rustup installs them with the compiler.
 - The crate uses strict lints configured in `Cargo.toml`. Prefer
   `#[expect(lint, reason = "...")]` over `#[allow(lint)]`, and document safety around
   arithmetic, indexing, and unwrapping.
 - Unit tests live in nested `tests.rs` submodules per module (`src/<module>/tests.rs`).
+  Public-API scenarios live under [`tests/`](tests/README.md), and [`examples/`](examples/README.md)
+  holds runnable programs with their own tests. [`benches/`](benches/README.md) holds Criterion
+  benchmarks: `cargo test --all-targets` runs each case once as a smoke check, and `cargo bench`
+  measures them; their README describes the methodology and links the measured baseline. Tests,
+  examples, and benchmarks all ship in the package.
 - Before submitting, run the fast checks with the development compiler:
 
   ```bash
