@@ -1,0 +1,117 @@
+[
+  {
+    "name": "Type: Bug",
+    "color": "d73a4a",
+    "description": "Incorrect behavior, broken functionality, or a regression."
+  },
+  {
+    "name": "Type: Enhancement",
+    "color": "a2eeef",
+    "description": "Improve an existing capability, including its API, usability, or performance."
+  },
+  {
+    "name": "Type: Feature",
+    "color": "0e8a16",
+    "description": "Add a new capability."
+  },
+  {
+    "name": "Type: Design",
+    "color": "5319e7",
+    "description": "Explore a design, API shape, or direction before an actionable proposal exists."
+  },
+  {
+    "name": "Type: Documentation",
+    "color": "0075ca",
+    "description": "Documentation, examples, or contributor instructions."
+  },
+  {
+    "name": "Type: Testing",
+    "color": "e4e669",
+    "description": "Tests, benchmarks, Miri, fuzzing, or other verification."
+  },
+  {
+    "name": "Type: Maintenance",
+    "color": "6a737d",
+    "description": "Dependencies, toolchain, CI, releases, refactoring, or repository upkeep."
+  },
+  {
+    "name": "Type: Question",
+    "color": "d876e3",
+    "description": "Ask how the project works or how to use it."
+  },
+  {
+    "name": "Type: Tracking",
+    "color": "8b5a2b",
+    "description": "Index of related issues or a review report; closes when its items are resolved."
+  },
+  {
+    "name": "Status: Confirmed",
+    "color": "0e8a16",
+    "description": "Reproduced defect, or request the maintainer has accepted; not a delivery commitment."
+  },
+  {
+    "name": "Status: Needs Information",
+    "color": "fbca04",
+    "description": "Waiting for reporter details, answers, or validation results."
+  },
+  {
+    "name": "Status: Blocked",
+    "color": "d93f0b",
+    "description": "Waiting on another issue, an unreleased dependency, or another stated external condition."
+  },
+  {
+    "name": "Status: Can't Reproduce",
+    "color": "fef2c0",
+    "description": "A documented reproduction attempt did not reproduce the report."
+  },
+  {
+    "name": "Status: Duplicate",
+    "color": "cfd3d7",
+    "description": "Already tracked elsewhere; link the canonical issue or PR."
+  },
+  {
+    "name": "Status: Won't Do",
+    "color": "666666",
+    "description": "Declined as out of scope or unsuitable in its proposed form."
+  },
+  {
+    "name": "Needs: Decision",
+    "color": "c71585",
+    "description": "Waiting for a maintainer decision on design, API, naming, scope, or policy."
+  },
+  {
+    "name": "Needs: Review",
+    "color": "d4c5f9",
+    "description": "Awaiting the maintainer's review and approval; a pull request carrying it must not merge."
+  },
+  {
+    "name": "Breaking Change",
+    "color": "b60205",
+    "description": "Requires a semver-incompatible release."
+  },
+  {
+    "name": "Soundness",
+    "color": "3d0a0a",
+    "description": "Concerns unsafe code or memory safety: safety arguments, unsound APIs, or undefined behavior."
+  },
+  {
+    "name": "Performance",
+    "color": "f29513",
+    "description": "Concerns speed, allocation, or memory use."
+  },
+  {
+    "name": "Experiment",
+    "color": "f9d0c4",
+    "description": "Concerns an experimental branch or proof of concept, not mainline code."
+  },
+  {
+    "name": "Good First Issue",
+    "color": "7057ff",
+    "description": "A scoped, ready task with a clear approach and beginner-friendly validation."
+  },
+  {
+    "name": "Help Wanted",
+    "color": "008672",
+    "description": "A scoped, accepted task for which outside contributions are welcome."
+  }
+]

@@ -64,3 +64,11 @@ workflow's commands identical to its document when either changes.
   jobs, by manual dispatch only. Dispatch it on the release branch and verify the run's head SHA
   before citing it as the release gate. The workflow must exist on `main` before dispatch.
 - Codeberg is a manual Git mirror; its Actions are disabled. Use GitHub for issues and PRs.
+
+## Issues and Pull Requests
+
+Labels follow the shared catalog from `strata-template`, copied verbatim to `.github/labels.json`;
+its [README](https://github.com/viell-dev/strata-template/blob/main/labels/README.md) says when
+each applies. Give every issue and pull request exactly one `Type:` label. An agent-written pull
+request opened from the maintainer's account carries `Needs: Review` from the start and is not
+merged until the maintainer's approval is recorded on it.
