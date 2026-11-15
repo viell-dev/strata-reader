@@ -51,7 +51,7 @@ fn test_records_cross_reads_and_transfer_consumed_data() {
     reader.compact();
 
     assert_eq!(reader.pos(), 0);
-    assert!(reader.peek_behind(1).is_empty());
+    assert_eq!(reader.peek_behind(1), b"");
 
     // EOF leaves an unterminated tail available for the caller's own record policy. One byte
     // of it was already read ahead with the second record.
@@ -167,7 +167,7 @@ fn test_binary_frames_across_short_reads() {
         assert_eq!(&frame.buf()[2..], expected);
         assert_eq!(frame.pos(), frame.len());
         assert_eq!(reader.pos(), 0);
-        assert!(reader.buffer().is_empty());
+        assert_eq!(reader.buffer(), b"");
     }
 
     // All three frames were consumed, including the empty one

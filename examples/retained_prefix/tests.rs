@@ -40,7 +40,7 @@ fn test_copy_body_empty_and_missing_header() {
     let header = copy_body(b"\n".as_slice(), &mut output).unwrap();
 
     assert_eq!(header.buf(), b"\n");
-    assert!(output.is_empty());
+    assert_eq!(output, b"");
 
     // EOF and the header capacity limit both reject input with no header newline
     for input in [Vec::new(), b"unfinished".to_vec(), vec![b'x'; CHUNK_SIZE]] {
@@ -48,7 +48,7 @@ fn test_copy_body_empty_and_missing_header() {
         let error = copy_body(input.as_slice(), &mut output).unwrap_err();
 
         assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-        assert!(output.is_empty());
+        assert_eq!(output, b"");
     }
 }
 

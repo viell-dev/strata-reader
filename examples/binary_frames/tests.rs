@@ -32,7 +32,7 @@ fn test_print_frames() {
     let mut output = Vec::new();
     print_frames(io::empty(), &mut output).unwrap();
 
-    assert!(output.is_empty());
+    assert_eq!(output, b"");
 }
 
 #[test]
@@ -42,7 +42,7 @@ fn test_print_frames_truncated_input() {
         let error = print_frames(input, &mut output).unwrap_err();
 
         assert_eq!(error.kind(), io::ErrorKind::UnexpectedEof);
-        assert!(output.is_empty()); // No partial frame was printed
+        assert_eq!(output, b""); // No partial frame was printed
     }
 
     // An earlier complete frame stays written when the following frame is incomplete

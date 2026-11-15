@@ -59,7 +59,7 @@ fn test_growth_compaction_and_explicit_reclamation() {
 
     reader.discard();
 
-    assert!(reader.buffer().is_empty());
+    assert_eq!(reader.buffer(), b"");
     assert_eq!(reader.pos(), 0);
     assert_eq!(reader.capacity(), CHUNK_SIZE);
 }
@@ -79,7 +79,7 @@ fn test_handoff_preserves_read_ahead_and_the_remaining_source() {
 
     assert_eq!(saved.buf(), b"headtail");
     assert_eq!(saved.pos(), 4);
-    assert!(reader.buffer().is_empty());
+    assert_eq!(reader.buffer(), b"");
 
     // Refill once, then hand both the source and this second buffer to another consumer
     reader.fill().unwrap();
@@ -134,12 +134,12 @@ fn test_repeated_transfer_and_compaction() {
 
         // Either operation makes the next record start at position zero
         assert_eq!(reader.pos(), 0);
-        assert!(reader.peek_behind(1).is_empty());
+        assert_eq!(reader.peek_behind(1), b"");
     }
 
     let len = reader.fill().unwrap();
     assert_eq!(len, 0);
-    assert!(reader.buffer().is_empty());
+    assert_eq!(reader.buffer(), b"");
     drop(reader);
 
     // Earlier transferred records still hold their own bytes after all subsequent refills

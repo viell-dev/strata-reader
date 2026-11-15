@@ -28,7 +28,7 @@ fn test_empty_input_and_empty_record() {
     let mut output = Vec::new();
     print_records(io::empty(), &mut output).unwrap();
 
-    assert!(output.is_empty());
+    assert_eq!(output, b"");
     print_records(b"\n".as_slice(), &mut output).unwrap();
 
     assert_eq!(output, b"1 bytes: \n");
