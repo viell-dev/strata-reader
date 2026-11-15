@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- `Buffer::shrink_targeted` no longer sets the capacity above the allocated
+  buffer when the target exceeds the current capacity. Previously this broke
+  the buffer's capacity invariant and made the next fill panic. A target at or
+  above the current capacity now leaves the buffer unchanged.
+
 ## [0.1.3] - 2026-10-10
 
 Documentation, examples, testing, and project maintenance release. The public
@@ -178,6 +187,7 @@ dynamically growing buffer and explicit memory control.
 - Mozilla Public License 2.0.
 - Minimum Supported Rust Version of **1.87.0** on Rust edition 2024.
 
+[Unreleased]: https://github.com/viell-dev/strata-reader/compare/0.1.3...HEAD
 [0.1.3]: https://github.com/viell-dev/strata-reader/compare/0.1.2...0.1.3
 [0.1.2]: https://github.com/viell-dev/strata-reader/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/viell-dev/strata-reader/compare/0.1.0...0.1.1
