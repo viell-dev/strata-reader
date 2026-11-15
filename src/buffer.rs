@@ -713,6 +713,9 @@ impl Buffer {
     /// the current data or the specified target capacity, whichever requires more space. The
     /// minimum capacity is [`CHUNK_SIZE`].
     ///
+    /// This never grows the buffer: if `target`, rounded up to a [`CHUNK_SIZE`] multiple, is at
+    /// least the current capacity, no operation is performed.
+    ///
     /// # Examples
     ///
     /// ```
@@ -729,16 +732,34 @@ impl Buffer {
     /// // Shrink with a smaller target
     /// buffer.shrink_targeted(CHUNK_SIZE / 2);
     /// assert_eq!(buffer.cap(), CHUNK_SIZE);  // Minimum capacity is CHUNK_SIZE
+    ///
+    /// // No-op when the target exceeds the current capacity
+    /// buffer.shrink_targeted(16 * CHUNK_SIZE);
+    /// assert_eq!(buffer.cap(), CHUNK_SIZE);
     /// ```
     #[inline]
     pub fn shrink_targeted(&mut self, target: usize) {
-        // Round `self.len()` up to the next chunk boundary to ensure `self.cap()` >= `self.len()`
+        // Round up the target to the next chunk boundary
+        let next_target = Self::cap_up_linear(target);
+
+        // Do nothing if `next_target` is greater than or equal to `self.cap`
+        if next_target >= self.cap {
+            return;
+        }
+
+        // Round up `self.len` to the next chunk boundary to ensure `next` <= `self.cap`
         let mut next = Self::cap_up_linear(self.len);
 
-        // Round the target as well to be safe, then use the larger of data size or target
-        let next_target = Self::cap_up_linear(target);
+        // Take the larger size
         next = next.max(next_target);
 
+        /* Both sizes are bounded by `self.cap`: `next_target` by the early return, and the
+        rounded-up `self.len` by the buffer invariants. Thus `next <= self.cap`, and truncation can
+        never grow the buffer. If `next == self.cap`, `shrink_to` may still release excess
+        allocation without changing the logical capacity. */
+        debug_assert!(next <= self.cap);
+
+        // Shrink to the target size
         self.buf.truncate(next);
         self.buf.shrink_to(next);
         self.cap = next;

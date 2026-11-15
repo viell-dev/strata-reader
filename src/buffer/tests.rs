@@ -847,6 +847,12 @@ fn test_buffer_shrink_targeted() {
     assert!(buffer.buf.capacity() >= 250 * CHUNK_SIZE); // Also double check the internals
     assert_eq!(buffer.buf.len(), 250 * CHUNK_SIZE);
 
+    // Trying to shrink to the current size is a no-op
+    buffer.shrink_targeted(buffer.cap());
+    assert_eq!(buffer.cap(), 250 * CHUNK_SIZE);
+    assert!(buffer.buf.capacity() >= 250 * CHUNK_SIZE); // Also double check the internals
+    assert_eq!(buffer.buf.len(), 250 * CHUNK_SIZE);
+
     // Delete some data
     buffer.consume(150 * CHUNK_SIZE);
     buffer.compact();
@@ -895,6 +901,15 @@ fn test_buffer_shrink_targeted() {
     assert_eq!(buffer.cap(), CHUNK_SIZE);
     assert!(buffer.buf.capacity() >= CHUNK_SIZE); // Also double check the internals
     assert_eq!(buffer.buf.len(), CHUNK_SIZE);
+
+    // Grow the buffer for the next test
+    buffer.grow_targeted(4 * CHUNK_SIZE);
+
+    // Attempt to shrink to a larger size.
+    buffer.shrink_targeted(8 * CHUNK_SIZE);
+    assert_eq!(buffer.cap(), 4 * CHUNK_SIZE);
+    assert!(buffer.buf.capacity() >= 4 * CHUNK_SIZE); // Also double check the internals
+    assert_eq!(buffer.buf.len(), 4 * CHUNK_SIZE);
 }
 
 // -----------------------------------------------------------------------------
