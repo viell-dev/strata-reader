@@ -361,6 +361,25 @@ fn test_buffer_consume() {
 
     // It should still match the len we set
     assert_eq!(buffer.pos(), 4567);
+
+    // Consuming the maximum amount when all is already consumed should not overflow
+    buffer.consume(usize::MAX);
+
+    // It should still match the len we set
+    assert_eq!(buffer.pos(), 4567);
+
+    // Inject more test data so part of the buffer is unconsumed again
+    buffer.inject_test_data(&[b'x'; 1111]);
+
+    // It should not have moved pos
+    assert_eq!(buffer.pos(), 4567);
+    assert_eq!(buffer.len(), 5678);
+
+    // Consuming the maximum amount from inside the data should clamp to len
+    buffer.consume(usize::MAX);
+
+    // It should match the new len
+    assert_eq!(buffer.pos(), 5678);
 }
 
 #[test]

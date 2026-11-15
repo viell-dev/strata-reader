@@ -370,11 +370,14 @@ impl Buffer {
     /// buffer.fill(Cursor::new(b"Hello")).unwrap();
     /// buffer.consume(2);
     /// assert_eq!(buffer.pos(), 2);
+    ///
+    /// // Consuming more than is available clamps to the end of the data
+    /// buffer.consume(usize::MAX);
+    /// assert_eq!(buffer.pos(), 5);
     /// ```
-    #[expect(clippy::arithmetic_side_effects, reason = "Safe by invariant")]
     #[inline]
     pub fn consume(&mut self, amt: usize) {
-        self.pos = cmp::min(self.pos + amt, self.len);
+        self.pos = self.pos.saturating_add(amt).min(self.len);
     }
 
     /// Marks `amt` bytes as unconsumed, moving the read position backwards.
