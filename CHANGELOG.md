@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   buffer when the target exceeds the current capacity. Previously this broke
   the buffer's capacity invariant and made the next fill panic. A target at or
   above the current capacity now leaves the buffer unchanged.
+- `Buffer::consume`, and with it `BufRead::consume` on `Reader`, now clamps
+  the read position to the end of the data for any `amt`, as documented.
+  Previously an `amt` that overflowed the position, such as `usize::MAX`,
+  panicked in debug builds and moved the position backwards in release builds.
 
 ## [0.1.3] - 2026-10-10
 
