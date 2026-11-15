@@ -33,7 +33,7 @@ fn test_standard_io_and_relative_seek_respect_the_logical_position() {
     let position = reader.seek(SeekFrom::Current(2)).unwrap();
 
     assert_eq!(position, 9);
-    assert!(reader.buffer().is_empty());
+    assert_eq!(reader.buffer(), b"");
 
     let mut rest = String::new();
     reader.read_to_string(&mut rest).unwrap();
@@ -79,7 +79,7 @@ fn test_standard_consumers_after_retained_reads() {
         .unwrap();
 
     assert_eq!(lines, ["first", "", "界", "last"]);
-    assert!(reader.peek(1).is_empty());
+    assert_eq!(reader.peek(1), b"");
 
     // Try a bulk consumer with both read-ahead and input that still resides in the source
     let data = "abcde".repeat(10_000);

@@ -119,7 +119,7 @@ fn test_exact_fill_error_can_advance_the_source_without_exposing_new_bytes() {
     assert_eq!(error.kind(), io::ErrorKind::UnexpectedEof);
     assert_eq!(reader.get_ref().position(), 12);
     assert_eq!(reader.peek_behind(7), b"header:");
-    assert!(reader.peek(usize::MAX).is_empty());
+    assert_eq!(reader.peek(usize::MAX), b"");
 
     // Retrying cannot recover bytes the source supplied to the failed exact read.
     let len = reader.fill_to_end().unwrap();
