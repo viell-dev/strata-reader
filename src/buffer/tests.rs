@@ -833,6 +833,35 @@ fn test_buffer_grow_targeted_linear() {
     assert_eq!(buffer.buf.len(), 200 * CHUNK_SIZE);
 }
 
+#[test]
+fn test_buffer_resize_exact() {
+    let mut buffer = Buffer::with_capacity(3 * CHUNK_SIZE); // Not a power-of-2 multiple
+
+    // Double-check the starting cap
+    assert_eq!(buffer.cap(), 3 * CHUNK_SIZE);
+    assert_eq!(buffer.buf.len(), 3 * CHUNK_SIZE);
+
+    /* Assertion note: unlike the tests above, these also bound `buffer.buf.capacity()` from above.
+     * `Vec::resize` alone reserves with amortized growth, at least doubling the allocation, and at
+     * a 1 GiB buffer on 32-bit targets that request exceeds `isize::MAX` and panics. Exact
+     * reservation keeps the request at the target, which is all the upper bound checks.
+     */
+
+    // Grow by one chunk, the step `grow` takes from here
+    buffer.resize_exact(4 * CHUNK_SIZE);
+    assert_eq!(buffer.cap(), 4 * CHUNK_SIZE);
+    assert!(buffer.buf.capacity() >= 4 * CHUNK_SIZE); // Also double check the internals
+    assert!(buffer.buf.capacity() < 2 * 3 * CHUNK_SIZE); // Allocation was not doubled
+    assert_eq!(buffer.buf.len(), 4 * CHUNK_SIZE);
+
+    // Grow by less than double again, as a linear step toward a limit can
+    buffer.resize_exact(7 * CHUNK_SIZE);
+    assert_eq!(buffer.cap(), 7 * CHUNK_SIZE);
+    assert!(buffer.buf.capacity() >= 7 * CHUNK_SIZE); // Also double check the internals
+    assert!(buffer.buf.capacity() < 2 * 4 * CHUNK_SIZE); // Allocation was not doubled
+    assert_eq!(buffer.buf.len(), 7 * CHUNK_SIZE);
+}
+
 /* Coverage note: `shrink` is a thin wrapper over `shrink_targeted`.
  * Its behavior is covered by the `shrink_targeted` tests.
  */

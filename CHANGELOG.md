@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   trait, such as from generic code or `&mut dyn Seek`, used the standard
   default, which seeks the inner reader and clears the buffer. The inherent
   method remains and delegates to the trait implementation.
+- `Buffer` growth, and with it the `Reader` fills that grow the buffer, now
+  reserves exactly the target capacity. Previously `Vec::resize` reserved with
+  amortized growth, which could request more than the supported maximum:
+  growing a 1 GiB buffer on a 32-bit target panicked with `capacity overflow`
+  before attempting any allocation. The request now stays within the maximum;
+  as with any `Vec`, an allocation the platform cannot satisfy still aborts.
 
 ## [0.1.3] - 2026-10-10
 
