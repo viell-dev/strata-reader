@@ -69,8 +69,10 @@ impl<R: Read> ReaderBuilder<R> {
 /// matter across calls.
 ///
 /// [`Seek::seek`] clears the buffer after a successful seek. [`Seek::stream_position`] reports the
-/// logical position without clearing it. For buffer-preserving relative movement, use
-/// [`Reader::seek_relative`].
+/// logical position without clearing it. [`Seek::seek_relative`] moves within retained data
+/// without touching the inner reader, including through generic code and `&mut dyn Seek`, and
+/// falls back to `seek` outside it. The inherent [`Reader::seek_relative`] does the same without
+/// importing [`Seek`].
 #[derive(Debug)]
 pub struct Reader<R: ?Sized> {
     buffer: Buffer,
@@ -337,21 +339,21 @@ impl<R: Seek + ?Sized> Seek for Reader<R> {
                 )
             })
     }
-}
 
-impl<R: Seek + ?Sized> Reader<R> {
     /// Seeks relative to the current logical position.
     ///
     /// If the target remains inside the retained buffer, either forward through unconsumed bytes
     /// or backward through consumed lookbehind, only the buffer cursor moves and the inner reader
-    /// is left untouched.
+    /// is left untouched. This overrides the trait's default, so it also applies when called
+    /// through generic code or `&mut dyn Seek`.
     ///
-    /// If the target is outside the retained window, this falls back to [`Seek::seek_relative`].
+    /// If the target is outside the retained window, this falls back to
+    /// [`seek`](Seek::seek) with [`SeekFrom::Current`], which clears the buffer on success.
     #[expect(
         clippy::arithmetic_side_effects,
         reason = "pos ≤ len by Buffer invariant"
     )]
-    pub fn seek_relative(&mut self, offset: i64) -> io::Result<()> {
+    fn seek_relative(&mut self, offset: i64) -> io::Result<()> {
         let pos = self.buffer.pos();
         let len = self.buffer.len();
 
@@ -369,6 +371,23 @@ impl<R: Seek + ?Sized> Reader<R> {
             }
         }
 
+        /* Fall back the way the trait's default does. Calling `seek_relative` here in either form
+        would recurse: the trait method is this one, and the inherent method delegates to it. */
+        self.seek(SeekFrom::Current(offset))?;
+        Ok(())
+    }
+}
+
+impl<R: Seek + ?Sized> Reader<R> {
+    /// Seeks relative to the current logical position.
+    ///
+    /// This calls `Reader`'s implementation of [`Seek::seek_relative`] and is available without
+    /// importing [`Seek`]. If the target remains inside the retained buffer, either forward
+    /// through unconsumed bytes or backward through consumed lookbehind, only the buffer cursor
+    /// moves and the inner reader is left untouched. Otherwise it falls back to [`Seek::seek`],
+    /// which clears the buffer on success.
+    #[inline]
+    pub fn seek_relative(&mut self, offset: i64) -> io::Result<()> {
         Seek::seek_relative(self, offset)
     }
 }

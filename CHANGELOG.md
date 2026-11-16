@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the read position to the end of the data for any `amt`, as documented.
   Previously an `amt` that overflowed the position, such as `usize::MAX`,
   panicked in debug builds and moved the position backwards in release builds.
+- `Seek::seek_relative` on `Reader` now moves within retained buffered data,
+  like the inherent `Reader::seek_relative`. Previously calls through the
+  trait, such as from generic code or `&mut dyn Seek`, used the standard
+  default, which seeks the inner reader and clears the buffer. The inherent
+  method remains and delegates to the trait implementation.
 
 ## [0.1.3] - 2026-10-10
 

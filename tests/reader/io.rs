@@ -41,6 +41,28 @@ fn test_standard_io_and_relative_seek_respect_the_logical_position() {
     assert_eq!(rest, "yload");
 }
 
+/// Hand the reader to a caller that only sees `&mut dyn Seek` after consuming a header.
+#[test]
+fn test_seek_trait_object_moves_within_retained_data() {
+    // Filling reads ahead to the end, and consuming the header leaves it as lookbehind
+    let mut reader = Reader::new(Cursor::new(b"header:payload"));
+    reader.fill_until(b':').unwrap();
+    reader.consume(7);
+    let inner_position = reader.get_ref().position();
+
+    // The trait-object caller rewinds over the header, then skips into the read-ahead
+    let seeker: &mut dyn Seek = &mut reader;
+    seeker.seek_relative(-7).unwrap();
+    seeker.seek_relative(9).unwrap();
+    let position = seeker.stream_position().unwrap();
+
+    // Both targets were retained, so only the buffer cursor moved
+    assert_eq!(position, 9);
+    assert_eq!(reader.get_ref().position(), inner_position);
+    assert_eq!(reader.peek_behind(9), b"header:pa");
+    assert_eq!(reader.peek(5), b"yload");
+}
+
 /// Call the generic predicate wrapper through a trait object after consuming an earlier record.
 #[test]
 fn test_dynamic_trait_object_checks_existing_unconsumed_data() {

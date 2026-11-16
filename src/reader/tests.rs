@@ -573,7 +573,7 @@ fn test_reader_seek_stream_position() {
 }
 
 #[test]
-fn test_reader_seek_relative() {
+fn test_reader_seek_seek_relative() {
     // Create a reader against some data
     let data = "Hello, World!";
     let mut cur = Cursor::new(data);
@@ -581,8 +581,9 @@ fn test_reader_seek_relative() {
     let mut reader = Reader::new(cur);
     reader.buffer.inject_test_data(data.as_bytes()); // inject the above 13 bytes
 
-    // Seeking forward inside unconsumed buffered data only moves the buffer position
-    reader.seek_relative(5).unwrap();
+    /* Seeking forward inside unconsumed buffered data through the trait only moves the buffer
+    position. */
+    Seek::seek_relative(&mut reader, 5).unwrap();
 
     // Check that the state matches expectations
     assert_eq!(reader.buffer.pos(), 5);
@@ -597,7 +598,7 @@ fn test_reader_seek_relative() {
     reader.buffer.consume(7);
 
     // Seeking backward inside retained consumed data only moves the buffer position
-    reader.seek_relative(-5).unwrap();
+    Seek::seek_relative(&mut reader, -5).unwrap();
 
     // Check that the state matches expectations
     assert_eq!(reader.buffer.pos(), 2);
@@ -611,8 +612,8 @@ fn test_reader_seek_relative() {
     reader.buffer.inject_test_data(&data.as_bytes()[..5]); // inject the above 5 bytes
     reader.buffer.consume(3);
 
-    // Seeking forward outside unconsumed buffered data falls back to the Seek implementation
-    reader.seek_relative(5).unwrap();
+    // Seeking forward outside unconsumed buffered data falls back to `seek`
+    Seek::seek_relative(&mut reader, 5).unwrap();
 
     // Check that the state matches expectations
     assert_eq!(reader.inner.position(), 8); // logical position 3 + 5
@@ -626,13 +627,39 @@ fn test_reader_seek_relative() {
     reader.buffer.inject_test_data(&data.as_bytes()[7..]); // inject compacted retained data
     reader.buffer.consume(1);
 
-    // Seeking backward outside retained consumed data falls back to the Seek implementation
-    reader.seek_relative(-2).unwrap();
+    // Seeking backward outside retained consumed data falls back to `seek`
+    Seek::seek_relative(&mut reader, -2).unwrap();
 
     // Check that the state matches expectations
     assert_eq!(reader.inner.position(), 6); // logical position 8 - 2
     assert_eq!(reader.buffer.pos(), 0); // fallback seek clears the buffer
     assert_eq!(reader.buffer.len(), 0); // fallback seek clears the buffer
+}
+
+#[test]
+fn test_reader_seek_relative() {
+    // Create a reader against some data
+    let data = "Hello, World!";
+    let mut cur = Cursor::new(data);
+    cur.set_position(13); // simulate having read all bytes
+    let mut reader = Reader::new(cur);
+    reader.buffer.inject_test_data(data.as_bytes()); // inject the above 13 bytes
+
+    // The inherent method delegates to the trait method, so a forward seek keeps the buffer
+    reader.seek_relative(7).unwrap();
+
+    // Check that the state matches expectations
+    assert_eq!(reader.buffer.pos(), 7);
+    assert_eq!(reader.buffer.len(), 13); // buffer preserved when seek is within bounds
+    assert_eq!(reader.inner.position(), 13); // reader isn't touched when seek is within bounds
+
+    // A backward seek keeps the buffer too
+    reader.seek_relative(-5).unwrap();
+
+    // Check that the state matches expectations
+    assert_eq!(reader.buffer.pos(), 2);
+    assert_eq!(reader.buffer.len(), 13); // buffer preserved when seek is within bounds
+    assert_eq!(reader.inner.position(), 13); // reader isn't touched when seek is within bounds
 }
 
 // -----------------------------------------------------------------------------
