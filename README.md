@@ -26,8 +26,8 @@ unpredictable, lookbehind is useful, and you want to manage buffer lifetime your
 - **Peek methods**: `peek(n)` returns up to _n_ unconsumed bytes without advancing the read
   position; `peek_behind(n)` returns up to _n_ already-consumed bytes still in the buffer.
 - **Seek support**: `Seek::stream_position()` reports the logical stream position, `Seek::seek()`
-  clears the buffer after successful seeks, and `Reader::seek_relative()` can move within
-  retained buffered data without touching the inner reader.
+  clears the buffer after successful seeks, and `Seek::seek_relative()`, also available as an
+  inherent method, can move within retained buffered data without touching the inner reader.
 
 [Benchmarks](benches/README.md) compare sequential reads, record processing, and buffer lifecycles;
 [measured results](benches/BASELINE.md) include the inputs and conclusions for each comparison.
