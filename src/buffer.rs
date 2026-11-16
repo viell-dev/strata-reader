@@ -652,8 +652,7 @@ impl Buffer {
         let next = Self::cap_up(target);
 
         if next > self.cap {
-            self.buf.resize(next, 0);
-            self.cap = next;
+            self.resize_exact(next);
         }
     }
 
@@ -681,9 +680,26 @@ impl Buffer {
         let next = Self::cap_up_linear(target);
 
         if next > self.cap {
-            self.buf.resize(next, 0);
-            self.cap = next;
+            self.resize_exact(next);
         }
+    }
+
+    /// Grows the storage to `next` bytes, reserving exactly that capacity first.
+    ///
+    /// `Vec::resize` alone reserves with amortized growth, which requests at least twice the
+    /// current allocation. Near [`MAX_SUPPORTED_CAPACITY`] that request exceeds `isize::MAX` and
+    /// panics, although `next` itself is supported, so the exact reservation comes first and
+    /// `resize` then only writes zeros.
+    #[expect(
+        clippy::arithmetic_side_effects,
+        reason = "next > cap == buf.len() by caller check and Buffer invariant"
+    )]
+    fn resize_exact(&mut self, next: usize) {
+        debug_assert!(next > self.cap);
+
+        self.buf.reserve_exact(next - self.buf.len());
+        self.buf.resize(next, 0);
+        self.cap = next;
     }
 
     /// Shrinks the buffer capacity to fit the current data.
